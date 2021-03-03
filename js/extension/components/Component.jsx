@@ -1,9 +1,10 @@
 import React from "react";
 import Message from "@mapstore/components/I18N/Message";
 import src from "../assets/markers_default.png";
-const Extension = ({ value = 0, onIncrease, changeZoomLevel }) => {
+const Extension = ({ value = 0, onIncrease, changeZoomLevel, fetchData }) => {
     return (<div id="SAMPLE_EXTENSION" >
         <h2>Extension Sample</h2>
+        <button onClick={fetchData} className="btn-primary square-button btn">API</button>
         <div>This is a sample extension plugin. The following tools demonstrate the correct binding inside MapStore</div>
         <h3>State and epics</h3>
         <div>A button like this should be visualized also in the toolbar: <br /><button onClick={onIncrease} className="btn-primary square-button btn">INC</button><br /> </div>

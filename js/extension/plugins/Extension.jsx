@@ -6,6 +6,8 @@ import Rx from "rxjs";
 import { changeZoomLevel } from "@mapstore/actions/map";
 
 import '../assets/style.css';
+import axios from '@mapstore/libs/ajax';
+
 export default {
     name,
     component: connect(state => ({
@@ -15,7 +17,12 @@ export default {
             return {
                 type: 'INCREASE_COUNTER'
             };
-        }, changeZoomLevel
+        }, changeZoomLevel,
+        fetchData: () => {
+            return {
+                type: 'FETCH_DATA'
+            }
+        }
     })(ExtensionComponent),
     reducers: {
         sampleExtension: (state = { value: 1 }, action) => {
@@ -31,6 +38,13 @@ export default {
             console.log('CURRENT VALUE: ' + store.getState().sampleExtension.value);
             /* eslint-enable */
             return Rx.Observable.empty();
+        }),
+        fetchData: (action$, store) => action$.ofType('FETCH_DATA').switchMap(() => {
+            console.log(store.getState());
+            return Rx.Observable.defer(() => axios.get("https://georchestra.mydomain.org/mapstore-reports/reports"))
+                .map((response) => {
+                    console.log(response)
+                })
         })
     },
     containers: {
