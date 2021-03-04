@@ -3,45 +3,73 @@ import { name } from '../../../config';
 
 import ExtensionComponent from "../components/Component";
 import Rx from "rxjs";
-import { changeZoomLevel } from "@mapstore/actions/map";
+import { fetchSchemas, loadedSchemas, loadError, displayForm } from "./actions"
 
 import '../assets/style.css';
+import axios from '@mapstore/libs/ajax';
+
+const mockSchemas = [{
+    title: "Todo",
+    type: "object",
+    required: ["title"],
+    properties: {
+      title: {type: "string", title: "Title", default: "A new task"},
+      done: {type: "boolean", title: "Done?", default: false}
+    }
+}]
+
 export default {
     name,
     component: connect(state => ({
-        value: state.sampleExtension && state.sampleExtension.value
+        schemas: state.reportExtension && state.reportExtension.schemas,
+        display: state.reportExtension && state.reportExtension.display
     }), {
-        onIncrease: () => {
-            return {
-                type: 'INCREASE_COUNTER'
-            };
-        }, changeZoomLevel
+        fetchSchemas,
+        loadedSchemas,
+        loadError,
+        displayForm
     })(ExtensionComponent),
     reducers: {
-        sampleExtension: (state = { value: 1 }, action) => {
-            if (action.type === 'INCREASE_COUNTER') {
-                return { value: state.value + 1 };
+        reportExtension: (state = { schemas: [{}], display: false, error: '' }, action) => {
+            console.log(action);
+            switch (action.type) {
+                case 'LOADED_SCHEMAS':
+                    return {...
+                        state,
+                        schemas: action.payload
+                    };
+                case 'LOAD_ERROR':
+                    return {...
+                        state,
+                        error: action.error
+                    };
+                case 'DISPLAY_FORM':
+                    return {...
+                        state,
+                        display: !state.display
+                    };
+                default:
+                    return state;
             }
-            return state;
         }
     },
     epics: {
-        logCounterValue: (action$, store) => action$.ofType('INCREASE_COUNTER').switchMap(() => {
-            /* eslint-disable */
-            console.log('CURRENT VALUE: ' + store.getState().sampleExtension.value);
-            /* eslint-enable */
-            return Rx.Observable.empty();
+        fetchSchemas: (action$, store) => action$.ofType('FETCH_SCHEMAS').switchMap(() => {
+            //TODO: make axios work with our API (fetch does) and use API
+            return Rx.Observable.defer(() => axios.get("https://georchestra.mydomain.org/mapstore-reports/reports"))
+                .switchMap((response) => Rx.Observable.of(loadedSchemas(/*response.data*/mockSchemas)))
+                .catch(e => Rx.Observable.of(loadError(e.message)));
         })
     },
     containers: {
         Toolbar: {
-            name: "sampleExtension",
+            name: "reportExtension",
             position: 10,
-            text: "INC",
+            text: "Report",
             doNotHide: true,
             action: () => {
                 return {
-                    type: 'INCREASE_COUNTER'
+                    type: 'DISPLAY_FORM'
                 };
             },
             priority: 1
