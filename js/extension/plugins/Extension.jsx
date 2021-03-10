@@ -31,7 +31,6 @@ export default {
     })(ExtensionComponent),
     reducers: {
         reportExtension: (state = { schemas: [{}], display: false, error: '' }, action) => {
-            console.log(action);
             switch (action.type) {
                 case 'LOADED_SCHEMAS':
                     return {...
@@ -59,6 +58,17 @@ export default {
             return Rx.Observable.defer(() => axios.get("https://georchestra.mydomain.org/mapstore-reports/reports"))
                 .switchMap((response) => Rx.Observable.of(loadedSchemas(/*response.data*/mockSchemas)))
                 .catch(e => Rx.Observable.of(loadError(e.message)));
+
+            // //get data from API response (in dev)
+            // return Rx.Observable.fromPromise(
+            //         fetch('http://localhost:8080/report_models')
+            //             .then(response => response.json())
+            //     )
+            //     .switchMap((response) => {
+            //         return Rx.Observable.of(loadedSchemas(response))
+            //     })
+            //     .catch(e => Rx.Observable.of(loadError(e.message)));
+  
         })
     },
     containers: {
