@@ -7,4 +7,9 @@
     position: absolute;
     top: 50px;
     z-index: 1000;
+    min-width: 200px;
+}
+
+#MODEL_SELECT {
+    margin-bottom: 10px;;
 }

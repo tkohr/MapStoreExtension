@@ -23,3 +23,10 @@ export const loadError = (error) => {
       error
   };
 };
+
+export const selectSchema = (payload) => {
+  return {
+      type: 'SELECT_SCHEMA',
+      payload
+  };
+};

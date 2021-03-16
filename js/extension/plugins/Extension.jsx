@@ -3,34 +3,29 @@ import { name } from '../../../config';
 
 import ExtensionComponent from "../components/Component";
 import Rx from "rxjs";
-import { fetchSchemas, loadedSchemas, loadError, displayForm } from "./actions"
-
+import { fetchSchemas, loadedSchemas, loadError, displayForm, selectSchema } from "./actions";
+import { schemasByLayersSelector } from "./selectors";
+import { mockSchemas } from "./mockSchemas";
 import '../assets/style.css';
 import axios from '@mapstore/libs/ajax';
-
-const mockSchemas = [{
-    title: "Todo",
-    type: "object",
-    required: ["title"],
-    properties: {
-      title: {type: "string", title: "Title", default: "A new task"},
-      done: {type: "boolean", title: "Done?", default: false}
-    }
-}]
+import {get} from 'lodash';
 
 export default {
     name,
     component: connect(state => ({
         schemas: state.reportExtension && state.reportExtension.schemas,
-        display: state.reportExtension && state.reportExtension.display
+        display: state.reportExtension && state.reportExtension.display,
+        schemasByLayers: schemasByLayersSelector(state),
+        selectedSchema: state.reportExtension && state.reportExtension.selectedSchema,
     }), {
         fetchSchemas,
         loadedSchemas,
         loadError,
-        displayForm
+        displayForm,
+        selectSchema
     })(ExtensionComponent),
     reducers: {
-        reportExtension: (state = { schemas: [{}], display: false, error: '' }, action) => {
+        reportExtension: (state = { schemas: [{}], selectedSchema: undefined, display: false, error: '' }, action) => {
             switch (action.type) {
                 case 'LOADED_SCHEMAS':
                     return {...
@@ -46,6 +41,11 @@ export default {
                     return {...
                         state,
                         display: !state.display
+                    };
+                case 'SELECT_SCHEMA':
+                    return {...
+                        state,
+                        selectedSchema: action.payload.value
                     };
                 default:
                     return state;
@@ -75,7 +75,7 @@ export default {
         Toolbar: {
             name: "reportExtension",
             position: 10,
-            text: "Report",
+            text: "Rapport",
             doNotHide: true,
             action: () => {
                 return {
