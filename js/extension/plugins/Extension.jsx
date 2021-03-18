@@ -7,6 +7,13 @@ import { fetchSchemas, loadedSchemas, loadError, displayForm } from "./actions"
 
 import '../assets/style.css';
 import axios from '@mapstore/libs/ajax';
+import {
+    updateNode,
+    updateSettingsParams
+} from 'mapstore2/web/client/actions/layers'
+import {layersSelector} from 'mapstore2/web/client/selectors/layers'
+import ReportIdentifyViewer from '@js/extension/components/ReportIdentifyViewer'
+import * as MapInfoUtils from 'mapstore2/web/client/utils/MapInfoUtils'
 
 const mockSchemas = [{
     title: "Todo",
@@ -31,7 +38,6 @@ export default {
     })(ExtensionComponent),
     reducers: {
         reportExtension: (state = { schemas: [{}], display: false, error: '' }, action) => {
-            console.log(action);
             switch (action.type) {
                 case 'LOADED_SCHEMAS':
                     return {...
@@ -57,8 +63,23 @@ export default {
         fetchSchemas: (action$, store) => action$.ofType('FETCH_SCHEMAS').switchMap(() => {
             //TODO: make axios work with our API (fetch does) and use API
             return Rx.Observable.defer(() => axios.get("https://georchestra.mydomain.org/mapstore-reports/reports"))
-                .switchMap((response) => Rx.Observable.of(loadedSchemas(/*response.data*/mockSchemas)))
+                .switchMap((response) => {
+                    console.log('axios', response)
+                    return Rx.Observable.of(loadedSchemas(/*response.data*/mockSchemas))
+                })
                 .catch(e => Rx.Observable.of(loadError(e.message)));
+        }),
+        displayForm: (action$, store) => action$.ofType('DISPLAY_FORM').mergeMap(() => {
+            MapInfoUtils.setViewer('reportViewer', ReportIdentifyViewer)
+            const layers = layersSelector(store.getState())
+            console.log(store);
+            console.log(layers);
+            return Rx.Observable.of(...layers.filter( layer => layer.type === 'wms').map( layer => updateNode(layer.id, 'layers', {featureInfo: {
+                    format: "PROPERTIES",
+                    viewer: {
+                        type: 'reportViewer'
+                    }
+                }})))
         })
     },
     containers: {
@@ -68,9 +89,11 @@ export default {
             text: "Report",
             doNotHide: true,
             action: () => {
+
                 return {
                     type: 'DISPLAY_FORM'
                 };
+
             },
             priority: 1
         }
