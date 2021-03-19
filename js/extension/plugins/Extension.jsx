@@ -9,6 +9,13 @@ import { mockSchemas } from "./mockSchemas";
 import '../assets/style.css';
 import axios from '@mapstore/libs/ajax';
 import {get} from 'lodash';
+import {
+    updateNode,
+    updateSettingsParams
+} from 'mapstore2/web/client/actions/layers'
+import {layersSelector} from 'mapstore2/web/client/selectors/layers'
+import ReportIdentifyViewer from '@js/extension/components/ReportIdentifyViewer'
+import * as MapInfoUtils from 'mapstore2/web/client/utils/MapInfoUtils'
 
 export default {
     name,
@@ -69,7 +76,19 @@ export default {
             //     })
             //     .catch(e => Rx.Observable.of(loadError(e.message)));
   
-        })
+        }),
+        displayForm: (action$, store) => action$.ofType('DISPLAY_FORM').mergeMap(() => {
+            MapInfoUtils.setViewer('reportViewer', ReportIdentifyViewer)
+            const layers = layersSelector(store.getState())
+            console.log(store);
+            console.log(layers);
+            return Rx.Observable.of(...layers.filter( layer => layer.type === 'wms').map( layer => updateNode(layer.id, 'layers', {featureInfo: {
+                    format: "PROPERTIES",
+                    viewer: {
+                        type: 'reportViewer'
+                    }
+                }})))
+            })
     },
     containers: {
         Toolbar: {
