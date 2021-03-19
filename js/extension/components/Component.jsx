@@ -4,11 +4,12 @@ import Form from "@rjsf/core";
 
 const log = (type) => console.log.bind(console, type);
 
-const Extension = ({ display, schemasByLayers, selectedSchema, fetchSchemas, selectSchema }) => {
+const Extension = ({ display, schemasByLayers, selectedSchema, currentFeatures, fetchSchemas, selectSchema }) => {
   useEffect(() => {
     fetchSchemas();
   }, [])
 
+  console.log('++++++', currentFeatures);
   /* TODOs: 
     - allow to choose schema of the ones available for the layer(s) => done
     - decide which feature is selected (not in store) or select it when editing report (templates complicate acces to feature id)

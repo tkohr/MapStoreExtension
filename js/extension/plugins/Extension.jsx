@@ -5,6 +5,7 @@ import ExtensionComponent from "../components/Component";
 import Rx from "rxjs";
 import { fetchSchemas, loadedSchemas, loadError, displayForm, selectSchema } from "./actions";
 import { schemasByLayersSelector } from "./selectors";
+import { currentFeatureSelector } from '@mapstore/selectors/mapInfo';
 import { mockSchemas } from "./mockSchemas";
 import '../assets/style.css';
 import axios from '@mapstore/libs/ajax';
@@ -22,6 +23,7 @@ const extensionComponent = connect(state => ({
     display: state.reportExtension && state.reportExtension.display,
     schemasByLayers: schemasByLayersSelector(state),
     selectedSchema: state.reportExtension && state.reportExtension.selectedSchema,
+    currentFeatures: currentFeatureSelector(state)
 }), {
     fetchSchemas,
     loadedSchemas,
