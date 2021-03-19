@@ -17,20 +17,22 @@ import {layersSelector} from 'mapstore2/web/client/selectors/layers'
 import ReportIdentifyViewer from '@js/extension/components/ReportIdentifyViewer'
 import * as MapInfoUtils from 'mapstore2/web/client/utils/MapInfoUtils'
 
+const extensionComponent = connect(state => ({
+    schemas: state.reportExtension && state.reportExtension.schemas,
+    display: state.reportExtension && state.reportExtension.display,
+    schemasByLayers: schemasByLayersSelector(state),
+    selectedSchema: state.reportExtension && state.reportExtension.selectedSchema,
+}), {
+    fetchSchemas,
+    loadedSchemas,
+    loadError,
+    displayForm,
+    selectSchema
+})(ExtensionComponent);
+
 export default {
     name,
-    component: connect(state => ({
-        schemas: state.reportExtension && state.reportExtension.schemas,
-        display: state.reportExtension && state.reportExtension.display,
-        schemasByLayers: schemasByLayersSelector(state),
-        selectedSchema: state.reportExtension && state.reportExtension.selectedSchema,
-    }), {
-        fetchSchemas,
-        loadedSchemas,
-        loadError,
-        displayForm,
-        selectSchema
-    })(ExtensionComponent),
+    component: extensionComponent,
     reducers: {
         reportExtension: (state = { schemas: [{}], selectedSchema: undefined, display: false, error: '' }, action) => {
             switch (action.type) {
@@ -78,17 +80,24 @@ export default {
   
         }),
         displayForm: (action$, store) => action$.ofType('DISPLAY_FORM').mergeMap(() => {
-            MapInfoUtils.setViewer('reportViewer', ReportIdentifyViewer)
+            MapInfoUtils.setViewer('reportViewer', extensionComponent)
             const layers = layersSelector(store.getState())
             console.log(store);
             console.log(layers);
-            return Rx.Observable.of(...layers.filter( layer => layer.type === 'wms').map( layer => updateNode(layer.id, 'layers', {featureInfo: {
-                    format: "PROPERTIES",
-                    viewer: {
-                        type: 'reportViewer'
-                    }
-                }})))
-            })
+            return Rx.Observable.of(...layers.filter( layer => layer.type === 'wms').map( layer => 
+                updateNode(
+                    layer.id, 
+                    'layers', 
+                    {
+                        featureInfo: {
+                            format: "PROPERTIES",
+                            viewer: {
+                                type: 'reportViewer'
+                            }
+                    }}
+                )
+            ))
+        })
     },
     containers: {
         Toolbar: {
