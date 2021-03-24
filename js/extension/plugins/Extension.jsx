@@ -3,7 +3,9 @@ import { name } from '../../../config';
 
 import ExtensionComponent from "../components/Component";
 import Rx from "rxjs";
-import { fetchSchemas, loadedSchemas, loadError, displayForm, selectSchema } from "./actions";
+import { fetchSchemas, loadedSchemas, loadError, displayForm, selectSchema } from "../actions/actions";
+import reportExtension from "../reducers/reducers"
+import {fetchSchemasEpic, displayFormEpic} from '../epics/epics'
 import { schemasByLayersSelector } from "./selectors";
 import { currentFeatureSelector } from '@mapstore/selectors/mapInfo';
 import { mockSchemas } from "./mockSchemas";
@@ -15,10 +17,10 @@ import {
     updateSettingsParams
 } from 'mapstore2/web/client/actions/layers'
 import {layersSelector} from 'mapstore2/web/client/selectors/layers'
-import ReportIdentifyViewer from '@js/extension/components/ReportIdentifyViewer'
 import * as MapInfoUtils from 'mapstore2/web/client/utils/MapInfoUtils'
 
-const extensionComponent = connect(state => ({
+
+export const extensionComponent = connect(state => ({
     schemas: state.reportExtension && state.reportExtension.schemas,
     display: state.reportExtension && state.reportExtension.display,
     schemasByLayers: schemasByLayersSelector(state),
@@ -35,34 +37,7 @@ const extensionComponent = connect(state => ({
 export default {
     name,
     component: extensionComponent,
-    reducers: {
-        reportExtension: (state = { schemas: [{}], selectedSchema: undefined, display: false, error: '' }, action) => {
-            switch (action.type) {
-                case 'LOADED_SCHEMAS':
-                    return {...
-                        state,
-                        schemas: action.payload
-                    };
-                case 'LOAD_ERROR':
-                    return {...
-                        state,
-                        error: action.error
-                    };
-                case 'DISPLAY_FORM':
-                    return {...
-                        state,
-                        display: !state.display
-                    };
-                case 'SELECT_SCHEMA':
-                    return {...
-                        state,
-                        selectedSchema: action.payload.value
-                    };
-                default:
-                    return state;
-            }
-        }
-    },
+    reducers: {reportExtension},
     epics: {
         fetchSchemas: (action$, store) => action$.ofType('FETCH_SCHEMAS').switchMap(() => {
             //TODO: make axios work with our API (fetch does) and use API
