@@ -2,10 +2,13 @@ import {loadedSchemas, loadError} from "../actions/actions";
 import {layersSelector} from 'mapstore2/web/client/selectors/layers'
 import * as MapInfoUtils from 'mapstore2/web/client/utils/MapInfoUtils'
 import {extensionComponent} from '../plugins/Extension.jsx'
-import {
-    updateNode
-} from 'mapstore2/web/client/actions/layers'
+import { updateNode } from 'mapstore2/web/client/actions/layers'
+import { updateFeatureInfoClickPoint } from "@mapstore/actions/mapInfo"
 import Rx from "rxjs";
+
+import { mockSchemas } from "../plugins/mockSchemas";
+import '../assets/style.css';
+import axios from '@mapstore/libs/ajax';
 
 
 export const fetchSchemasEpic = (action$, store) => action$.ofType('FETCH_SCHEMAS').switchMap(() => {
@@ -27,23 +30,39 @@ export const fetchSchemasEpic = (action$, store) => action$.ofType('FETCH_SCHEMA
     });
 
 export const   displayFormEpic = (action$, store) => action$.ofType('DISPLAY_FORM').mergeMap(() => {
-        MapInfoUtils.setViewer('reportViewer', extensionComponent)
+        
+        
+        // no featureInfo = identify mode
+        const display = store.getState().reportExtension.display;
+        const featureInfo = (display) ? {
+            format: "PROPERTIES",
+            viewer: {
+                type: 'reportViewer'
+            }
+        } : undefined;
+
         const layers = layersSelector(store.getState())
-        console.log(store);
-        console.log(layers);
-        return Rx.Observable.of(...layers.filter( layer => layer.type === 'wms').map( layer => 
-            updateNode(
-                layer.id, 
-                'layers', 
-                {
-                    featureInfo: {
-                        format: "PROPERTIES",
-                        viewer: {
-                            type: 'reportViewer'
-                        }
-                }}
+        const viewerObservable = Rx.Observable.of(
+            ...layers.filter( layer => layer.type === 'wms').map( layer => 
+                updateNode(
+                    layer.id, 
+                    'layers', 
+                    { featureInfo: featureInfo }
+                )
             )
-        ))
+        );
+
+        // if featureInfo or report is already displayed, force viewer refresh by simulating click 
+        const clickPoint = store.getState().mapInfo.clickPoint;
+        if (clickPoint) {
+            return Rx.Observable.merge(
+                viewerObservable,
+                Rx.Observable.of(updateFeatureInfoClickPoint(clickPoint))
+            );
+        }
+        else {
+            return viewerObservable;
+        }
     })
 
 export default {fetchSchemasEpic, displayFormEpic}
