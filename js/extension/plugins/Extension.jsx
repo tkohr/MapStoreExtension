@@ -3,7 +3,7 @@ import { name } from '../../../config';
 
 import ExtensionComponent from "../components/Component";
 import Rx from "rxjs";
-import { fetchSchemas, loadedSchemas, loadError, displayForm, selectSchema } from "../actions/actions";
+import { fetchSchemas, loadedSchemas, loadError, displayForm, selectSchema, addReportViewer } from "../actions/actions";
 import reportExtension from "../reducers/reducers"
 import {fetchSchemasEpic, displayFormEpic} from '../epics/epics'
 import { schemasByLayersSelector } from "./selectors";
@@ -31,7 +31,8 @@ export const extensionComponent = connect(state => ({
     loadedSchemas,
     loadError,
     displayForm,
-    selectSchema
+    selectSchema,
+    addReportViewer
 })(ExtensionComponent);
 
 export default {
@@ -39,42 +40,8 @@ export default {
     component: extensionComponent,
     reducers: {reportExtension},
     epics: {
-        fetchSchemas: (action$, store) => action$.ofType('FETCH_SCHEMAS').switchMap(() => {
-            //TODO: make axios work with our API (fetch does) and use API
-            return Rx.Observable.defer(() => axios.get("https://georchestra.mydomain.org/mapstore-reports/reports"))
-                .switchMap((response) => Rx.Observable.of(loadedSchemas(/*response.data*/mockSchemas)))
-                .catch(e => Rx.Observable.of(loadError(e.message)));
-
-            // //get data from API response (in dev)
-            // return Rx.Observable.fromPromise(
-            //         fetch('http://localhost:8080/report_models')
-            //             .then(response => response.json())
-            //     )
-            //     .switchMap((response) => {
-            //         return Rx.Observable.of(loadedSchemas(response))
-            //     })
-            //     .catch(e => Rx.Observable.of(loadError(e.message)));
-  
-        }),
-        displayForm: (action$, store) => action$.ofType('DISPLAY_FORM').mergeMap(() => {
-            MapInfoUtils.setViewer('reportViewer', extensionComponent)
-            const layers = layersSelector(store.getState())
-            console.log(store);
-            console.log(layers);
-            return Rx.Observable.of(...layers.filter( layer => layer.type === 'wms').map( layer => 
-                updateNode(
-                    layer.id, 
-                    'layers', 
-                    {
-                        featureInfo: {
-                            format: "PROPERTIES",
-                            viewer: {
-                                type: 'reportViewer'
-                            }
-                    }}
-                )
-            ))
-        })
+        fetchSchemasEpic,
+        displayFormEpic
     },
     containers: {
         Toolbar: {
@@ -87,6 +54,10 @@ export default {
                     type: 'DISPLAY_FORM'
                 };
             },
+            selector: (state) => ({
+                bsStyle: state.reportExtension && state.reportExtension.display ? "success" : "primary",
+                active: !!(state.reportExtension && state.reportExtension.display)
+            }),
             priority: 1
         }
     }

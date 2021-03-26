@@ -30,3 +30,9 @@ export const selectSchema = (payload) => {
       payload
   };
 };
+
+export const addReportViewer = () => {
+  return {
+    type: 'ADD_REPORT_VIEWER'
+};
+}

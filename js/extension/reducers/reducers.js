@@ -1,5 +1,5 @@
-
-
+import * as MapInfoUtils from 'mapstore2/web/client/utils/MapInfoUtils';
+import {extensionComponent} from '../plugins/Extension.jsx'
 
 function reportExtension(state = { schemas: [{}], selectedSchema: undefined, display: false, error: '' }, action) {
     switch (action.type) {
@@ -27,6 +27,9 @@ function reportExtension(state = { schemas: [{}], selectedSchema: undefined, dis
                 state,
                 selectedSchema: action.payload.value
             };
+        case 'ADD_REPORT_VIEWER':
+            MapInfoUtils.setViewer('reportViewer', extensionComponent);
+            return state;
         default:
             return state;
     }
