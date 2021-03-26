@@ -2,6 +2,8 @@ import React from "react";
 import Select from 'react-select';
 import Form from "@rjsf/core";
 
+import InfoButton from "@mapstore/components/buttons/InfoButton";
+
 const log = (type) => console.log.bind(console, type);
 
 class FeatureReports extends React.Component {
@@ -14,6 +16,10 @@ class FeatureReports extends React.Component {
         };
     }
 
+    featureToString(feature) {
+        return JSON.stringify({feature}, null, "4");
+    }
+
     selectSchema(schema) {
         this.setState({selectedSchema: schema})   
     }
@@ -23,6 +29,7 @@ class FeatureReports extends React.Component {
 
         return (<div>
             <div>{this.props.feature.id}</div>
+            <InfoButton glyphicon="info-sign" text="" title="Feature description" body={this.featureToString(this.props.feature)}/>
             <div id="MODEL_SELECT">
                 <p>Modèles de rapport</p>
                 <Select options={
