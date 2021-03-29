@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
 import FeatureReports from "./FeatureReports";
 
-const Extension = ({ display, schemasByLayers, currentFeatures, fetchSchemas, addReportViewer }) => {
+const Extension = ({ display, schemasByLayers, currentFeatures, fetchSchemas }) => {
   useEffect(() => {
     fetchSchemas();
-    addReportViewer();
   }, [])
   
 

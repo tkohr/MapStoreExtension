@@ -12,6 +12,7 @@ import axios from '@mapstore/libs/ajax';
 
 
 export const fetchSchemasEpic = (action$, store) => action$.ofType('FETCH_SCHEMAS').switchMap(() => {
+        MapInfoUtils.setViewer('reportViewer', extensionComponent);
         //TODO: make axios work with our API (fetch does) and use API
         return Rx.Observable.defer(() => axios.get("https://georchestra.mydomain.org/mapstore-reports/reports"))
             .switchMap((response) => Rx.Observable.of(loadedSchemas(/*response.data*/mockSchemas)))
