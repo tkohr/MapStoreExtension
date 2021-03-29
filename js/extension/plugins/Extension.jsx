@@ -2,10 +2,10 @@ import {connect} from "react-redux";
 import { name } from '../../../config';
 
 import ExtensionComponent from "../components/Component";
-import { fetchSchemas, loadedSchemas, loadError, displayForm, selectSchema } from "../actions/actions";
-import reportExtension from "../reducers/reducers";
-import {fetchSchemasEpic, displayFormEpic} from '../epics/epics';
-import { schemasByLayersSelector } from "./selectors";
+import { fetchSchemas, loadedSchemas, loadError, displayForm, selectSchema } from "../state/actions";
+import reportExtension from "../state/reducers";
+import {fetchSchemasEpic, displayFormEpic} from '../state/epics';
+import { schemasByLayersSelector } from "../state/selectors";
 import { currentFeatureSelector } from '@mapstore/selectors/mapInfo';
 import '../assets/style.css';
 

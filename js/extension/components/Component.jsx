@@ -13,8 +13,6 @@ const Extension = ({ display, schemasByLayers, currentFeatures, fetchSchemas }) 
             {currentFeatures &&
             currentFeatures.map(feature => {
                 return <FeatureReports feature={feature} schemasByLayers={schemasByLayers}/>;
-
-
             })
             }
         </div>}

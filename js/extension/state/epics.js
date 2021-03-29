@@ -1,4 +1,4 @@
-import { loadedSchemas /* ,loadError */ } from "../actions/actions";
+import { loadedSchemas /* ,loadError */ } from "./actions";
 import { layersSelector } from 'mapstore2/web/client/selectors/layers';
 import * as MapInfoUtils from 'mapstore2/web/client/utils/MapInfoUtils';
 import { extensionComponent } from '../plugins/Extension.jsx';
