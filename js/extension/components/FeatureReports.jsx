@@ -1,27 +1,24 @@
 import React from "react";
 import Select from 'react-select';
 import Form from "@rjsf/core";
+import PropTypes from 'prop-types';
 
 import InfoButton from "@mapstore/components/buttons/InfoButton";
 
 const log = (type) => console.log.bind(console, type);
 
 class FeatureReports extends React.Component {
+    static propTypes = {
+        feature: PropTypes.object,
+        schemasByLayers: PropTypes.object
+    };
 
     constructor(props) {
         super(props);
 
         this.state = {
-            selectedSchema: undefined,
+            selectedSchema: undefined
         };
-    }
-
-    featureToString(feature) {
-        return JSON.stringify({feature}, null, "4");
-    }
-
-    selectSchema(schema) {
-        this.setState({selectedSchema: schema})   
     }
 
     render() {
@@ -37,21 +34,29 @@ class FeatureReports extends React.Component {
                         const option = {
                             value: schemaByLayer,
                             label: schemaByLayer.title
-                        }
+                        };
                         return option;
                     }
                     )}
-                    onChange={(e) => {
-                        this.selectSchema(e.value)
-                    }}
+                onChange={(e) => {
+                    this.selectSchema(e.value);
+                }}
                 />
             </div>
             {selectedSchema && <Form schema={selectedSchema}
-            onChange={log("changed")}
-            onSubmit={log("submitted")}
-            onError={log("errors")} />
+                onChange={log("changed")}
+                onSubmit={log("submitted")}
+                onError={log("errors")} />
             }
-        </div>)
+        </div>);
+    }
+
+    featureToString(feature) {
+        return JSON.stringify({feature}, null, "4");
+    }
+
+    selectSchema(schema) {
+        this.setState({selectedSchema: schema});
     }
 }
 

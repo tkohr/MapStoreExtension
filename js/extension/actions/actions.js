@@ -1,32 +1,32 @@
 export const displayForm = () => {
-  return {
-    type: 'DISPLAY_FORM'
-  }
-}
+    return {
+        type: 'DISPLAY_FORM'
+    };
+};
 
 export const fetchSchemas = () => {
-  return {
-    type: 'FETCH_SCHEMAS'
-  }
-}
+    return {
+        type: 'FETCH_SCHEMAS'
+    };
+};
 
 export const loadedSchemas = (payload) => {
-  return {
-      type: 'LOADED_SCHEMAS',
-      payload
-  };
+    return {
+        type: 'LOADED_SCHEMAS',
+        payload
+    };
 };
 
 export const loadError = (error) => {
-  return {
-      type: 'LOAD_ERROR',
-      error
-  };
+    return {
+        type: 'LOAD_ERROR',
+        error
+    };
 };
 
 export const selectSchema = (payload) => {
-  return {
-      type: 'SELECT_SCHEMA',
-      payload
-  };
+    return {
+        type: 'SELECT_SCHEMA',
+        payload
+    };
 };
